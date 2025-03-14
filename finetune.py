@@ -1,19 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-get_ipython().system('pip install torch --index-url https://download.pytorch.org/whl/cu118')
-get_ipython().system('pip install transformers datasets accelerate peft bitsandbytes sentencepiece')
-get_ipython().system('pip install evaluate')
-get_ipython().system('pip install nltk')
-get_ipython().system('pip install rouge_score')
-
-
-# In[14]:
-
-
 import torch
 
 if torch.cuda.is_available():
@@ -173,19 +157,4 @@ print(results)
 
 model.save_pretrained("./deepseek_scitldr_lora")
 tokenizer.save_pretrained("./deepseek_scitldr_lora")
-
-
-# In[ ]:
-
-
-# ---------
-model = AutoModelForCausalLM.from_pretrained("./deepseek_scitldr_lora")
-tokenizer = AutoTokenizer.from_pretrained("./deepseek_scitldr_lora")
-input_text = "Summarize: Deep learning has achieved state-of-the-art results in many NLP tasks."
-input_ids = tokenizer(input_text, return_tensors="pt").input_ids.cuda()
-output = model.generate(input_ids, max_length=128)
-print(tokenizer.decode(output[0], skip_special_tokens=True))
-
-huggingface-cli login  # Log in first
-model.push_to_hub("your_username/deepseek_scitldr_lora")
 
