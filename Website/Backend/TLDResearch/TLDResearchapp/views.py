@@ -5,7 +5,7 @@ def home(request):
     return HttpResponse("hello world!!")
 
 import os
-import fitz  # PyMuPDF for PDF parsing
+import fitz
 import google.generativeai as genai
 import google.auth
 from django.http import JsonResponse
@@ -15,7 +15,8 @@ from django.core.files.base import ContentFile
 from google.auth import default
 
 # Configure Google Generative AI with service account
-credentials, _ = google.auth.load_credentials_from_file(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+print(os.getenv("GOOGLE_APPLICATION_CREDENTIAL"))
+credentials, _ = google.auth.load_credentials_from_file(os.getenv("GOOGLE_APPLICATION_CREDENTIAL"))
 genai.configure(credentials=credentials)
 
 def extract_text_from_pdf(pdf_path):

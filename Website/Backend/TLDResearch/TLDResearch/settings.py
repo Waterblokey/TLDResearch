@@ -31,8 +31,8 @@ SECRET_KEY = 'django-insecure-sku1a5!(kceg$ya^$q+23e6cpzarr-o)fa_3i*v40eidly-*z=
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 # Set environment variable
-GCP_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'credentials', 'acc.json')
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = GCP_CREDENTIALS_PATH
+#GCP_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'credentials', 'acc.json')
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = GCP_CREDENTIALS_PATH
 
 # Application definition
 
