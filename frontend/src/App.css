@@ -1,0 +1,28 @@
+/* .upload-title{
+  background-color: #007bff;
+} */
+
+.upload-container {
+  width: 100%;
+  max-width: 400px;
+  height: 200px;
+  border: 2px dashed #007bff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.upload-container:hover {
+  background-color: #e9ecef;
+  
+}
+
+.upload-container p {
+  color: #007bff;
+  font-weight: bold;
+}
