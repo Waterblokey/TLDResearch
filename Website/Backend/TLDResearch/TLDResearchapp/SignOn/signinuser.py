@@ -4,11 +4,16 @@ from django.http import JsonResponse
 
 from django.contrib.auth import authenticate
 import uuid
+from django.views.decorators.csrf import csrf_exempt
+import json
 
+@csrf_exempt
 def signIn(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        print("Raw request body:", request.body)  # Debug print
+        data = json.loads(request.body.decode("utf-8"))  # Parse JSON body
+        username = data.get("username")
+        password = data.get("password")
         if not all([username, password]):
             return HttpResponseBadRequest('Bad call to backend api')
         user = authenticate(username=username,password=password)

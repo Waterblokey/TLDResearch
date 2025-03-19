@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
-from SignOn import createuser
-from SignOn import signinuser
+from .SignOn import signinuser
+from .SignOn import createuser
 
 urlpatterns = [
     path("",views.home, name='home'),
