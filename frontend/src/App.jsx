@@ -1,6 +1,6 @@
 import { useState } from 'react'
 // import fileupload from "./fileupload";
-import fileupload from './fileupload';
+import FileUpload from './fileupload';
 
 import tldrLogo from './assets/tldresearch-logo.png'
 import './App.css'
@@ -12,7 +12,7 @@ function App() {
     <>
       <div className="App">
         <h1 className="upload-title">Upload File for Summarization</h1>
-        <fileupload/>
+        <FileUpload/>
       </div>
 
     </>

@@ -1,6 +1,24 @@
-/* .upload-title{
-  background-color: #007bff;
-} */
+.App {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center horizontally */
+  /* justify-content: center; Center vertically */
+  text-align: center;
+  height: 100vh; /* Full viewport height */
+  width: 100vw; /* Ensure full width */
+  gap: 20px; /* Adds spacing between elements */
+}
+
+
+
+.upload-title{
+  color: #007bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: xx-large;
+}
 
 .upload-container {
   width: 100%;

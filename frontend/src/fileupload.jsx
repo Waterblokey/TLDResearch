@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-const fileupload = () => {
+const FileUpload = () => {
   const [file, setFile] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -50,4 +50,4 @@ const fileupload = () => {
   );
 };
 
-export default fileupload;
+export default FileUpload;
