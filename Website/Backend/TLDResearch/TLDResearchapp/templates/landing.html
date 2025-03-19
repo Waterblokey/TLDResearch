@@ -55,8 +55,8 @@
     <div class="container">
         <h1>Welcome to TLDResearch</h1>
         <div class="button-group">
-            <button class="btn btn-login" onclick="location.href='login.html'">Login</button>
-            <button class="btn btn-register" onclick="location.href='register.html'">Register</button>
+            <a href="{% url 'login' %}" class="btn btn-login">Login</a>
+            <a href="{% url 'signup' %}" class="btn btn-register">Register</a>
         </div>
     </div>
 </body>
