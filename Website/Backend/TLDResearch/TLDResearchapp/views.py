@@ -13,10 +13,18 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from google.auth import default
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 
 # Configure Google Generative AI with service account
 credentials, _ = google.auth.load_credentials_from_file(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 genai.configure(credentials=credentials)
+
+db_user, db_password = os.getenv('MONGODB_USER'), os.getenv('MONGODB_PASS')
+
+mongouri = f'mongodb+srv://{db_user}:{db_password}@cluster0.ugz5x.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+
+mongo_client = MongoClient(mongouri)
 
 def extract_text_from_pdf(pdf_path):
     """Extracts text from a given PDF file."""
