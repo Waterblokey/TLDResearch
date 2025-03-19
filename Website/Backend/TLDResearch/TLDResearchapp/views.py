@@ -4,6 +4,7 @@ from django.shortcuts import render, HttpResponse
 def home(request):
     return HttpResponse("hello world!!")
 
+from datetime import datetime
 import os
 import fitz  # PyMuPDF for PDF parsing
 import google.generativeai as genai
@@ -25,6 +26,10 @@ db_user, db_password = os.getenv('MONGODB_USER'), os.getenv('MONGODB_PASS')
 mongouri = f'mongodb+srv://{db_user}:{db_password}@cluster0.ugz5x.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 
 mongo_client = MongoClient(mongouri)
+
+db = mongo_client['TLDResearch']
+summaries_collection = db['summaries']
+
 
 def extract_text_from_pdf(pdf_path):
     """Extracts text from a given PDF file."""
@@ -74,6 +79,18 @@ def handle_pdf_upload(request):
 
             # Send extracted text to Gemini AI
             ai_response = generate_gemini_response(extracted_text)
+            
+            session_cookie = request.GET.get('session_cookie')
+            username = request.session[session_cookie]
+
+            document = {
+                "username": username,
+                "file_name": file_name,
+                "summary": ai_response,
+                "timestamp": datetime.utcnow().isoformat()
+            }
+
+            insert = summaries_collection.insert_one(document)
 
             return JsonResponse({
                 "message": "File processed successfully",
