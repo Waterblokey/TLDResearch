@@ -83,14 +83,6 @@ def handle_pdf_upload(request):
             session_cookie = request.GET.get('session_cookie')
             username = request.session[session_cookie]
 
-            document = {
-                "username": username,
-                "file_name": file_name,
-                "summary": ai_response,
-                "timestamp": datetime.utcnow().isoformat()
-            }
-
-            insert = summaries_collection.insert_one(document)
 
             return JsonResponse({
                 "message": "File processed successfully",
