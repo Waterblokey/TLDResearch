@@ -279,11 +279,10 @@
         toggleBtn.addEventListener("click", () => {
             sidebar.classList.toggle("hidden");
         });
-        function typeText(div, text, minDelay = 50, maxDelay = 200) {
+        function typeText(div, text, minDelay = 10, maxDelay = 40) {
          let index = 0;
             function typeCharacter() {
                 if (index < text.length) {
-                    console.log('char c ' + text[index])
                     div.textContent += text[index];
                     index++;
                     setTimeout(typeCharacter, Math.random() * (maxDelay - minDelay) + minDelay);
