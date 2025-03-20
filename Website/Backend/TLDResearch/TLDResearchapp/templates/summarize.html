@@ -12,9 +12,31 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
+            /* margin: 0; */
+            background-color: #caa9ff;
+            /* background-image: linear-gradient(rgba(89, 66, 123, 0.97), rgba(117, 44, 228, 0.97)); */
+
+        }
+
+        /* Logout button container */
+        .logout-container {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .logout-button {
+            padding: 8px 15px;
+            border: none;
+            background: rgb(135, 59, 104);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .logout-button:hover {
+            background: darkred;
         }
 
         .container {
@@ -26,6 +48,9 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* background-image: linear-gradient(180deg, rgba(89, 66, 123, 0.97), rgba(117, 44, 228, 0.97)); */
+
+
         }
 
         .upload-box {
@@ -56,6 +81,11 @@
     </style>
 </head>
 <body>
+
+    <!-- Logout Button -->
+    <div class="logout-container">
+        <button class="logout-button" onclick="logout()">Logout</button>
+    </div>
 
     <div class="container">
         <h1>Upload File for Summarization</h1>
@@ -103,6 +133,12 @@
                 uploadText.textContent = file.name;
                 summarizeBtn.disabled = false;
             }
+        }
+
+        // Logout Function
+        function logout() {
+            alert("Logging out...");
+            window.location.href = "/logout"; // Redirect to logout URL
         }
     </script>
 
