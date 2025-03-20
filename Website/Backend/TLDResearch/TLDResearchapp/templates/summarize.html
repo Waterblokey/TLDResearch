@@ -10,36 +10,102 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            /* margin: 0; */
-            background-color: #caa9ff;
-            /* background-image: linear-gradient(rgba(89, 66, 123, 0.97), rgba(117, 44, 228, 0.97)); */
-
+            height: 40vh;
+            margin: 0;
+            background: linear-gradient(90deg, rgb(36 54 145) 0%, rgb(188 53 158) 100%);
         }
 
-        /* Logout button container */
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            height: 100%;
+            background: #333;
+            color: white;
+            padding: 10px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            position: fixed;
+            left: 0;
+            z-index: 4;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-220px);
+        }
+
+        .sidebar h3 {
+            text-align: center;
+        }
+
+        .summary-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .summary-list li {
+            padding: 5px;
+            border-bottom: 1px solid gray;
+            cursor: pointer;
+        }
+
+        .summary-list li:hover {
+            background: #444;
+        }
+
+        /* Sidebar Toggle Button */
+        .toggle-btn {
+            position: absolute;
+            left: 180px; /* Moves inside the sidebar */
+            top: 20px;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: left 0.3s ease-in-out;
+            z-index: 5;
+        }
+
+        .sidebar.hidden + .toggle-btn {
+            left: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Logout Form (Django-based) */
         .logout-container {
             position: absolute;
             top: 10px;
             right: 20px;
         }
 
-        .logout-button {
+        .logout-form button {
             padding: 8px 15px;
             border: none;
-            background: rgb(135, 59, 104);
+            background: red;
             color: white;
             font-size: 14px;
             cursor: pointer;
             border-radius: 5px;
         }
 
-        .logout-button:hover {
+        .logout-form button:hover {
             background: darkred;
         }
 
         .container {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Keeps it centered */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -48,12 +114,8 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-
-
-=======
-            width: 400px;
         }
-
+        
         .upload-box {
             width: 300px;
             height: 150px;
@@ -79,51 +141,55 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
-
-        .summary-box {
-            margin-top: 15px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background: #f9f9f9;
-            width: 100%;
-            min-height: 100px;
-            text-align: left;
-            white-space: pre-wrap;
-            display: none; /* Initially hidden */
-        }
     </style>
 </head>
 <body>
 
-    <!-- Logout Button -->
-    <div class="logout-container">
-        <button class="logout-button" onclick="logout()">Logout</button>
+    <!-- Sidebar (Summarization List) -->
+    <div class="sidebar" id="sidebar">
+        <h3>Summarizations</h3>
+        <ul class="summary-list" id="summaryList">
+            <li>No summarizations yet</li> <!-- Placeholder -->
+        </ul>
     </div>
 
-    <div class="container">
-        <h1>Upload File for Summarization</h1>
-        
-        <!-- File Upload Form -->
-        <form id="uploadForm">
-            <div class="upload-box" id="uploadBox">
-                <p id="uploadText">Drag & drop a file here, or click to upload</p>
-                <input type="file" id="fileInput" name="file" hidden>
-            </div>
+    <!-- Sidebar Toggle Button -->
+    <button class="toggle-btn" id="toggleSidebar">☰</button>
 
-            <button type="button" id="summarizeBtn" disabled>Summarize</button>
+    <!-- Logout Form -->
+    <div class="logout-container">
+        <form id="logout-form" action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
         </form>
+    </div>
 
-        <!-- Summary Display -->
-        <div class="summary-box" id="summaryBox"></div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <h1>Upload File for Summarization</h1>
+            
+            <!-- File Upload Form -->
+            <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                <div class="upload-box" id="uploadBox">
+                    <p id="uploadText">Drag & drop a file here, or click to upload</p>
+                    <input type="file" id="fileInput" name="file" hidden>
+                </div>
+
+                <button type="submit" id="summarizeBtn" disabled>Summarize</button>
+            </form>
+        </div>
     </div>
 
     <script>
+        // Inline JavaScript
         const uploadBox = document.getElementById("uploadBox");
         const fileInput = document.getElementById("fileInput");
         const summarizeBtn = document.getElementById("summarizeBtn");
         const uploadText = document.getElementById("uploadText");
-        const summaryBox = document.getElementById("summaryBox");
+        const summaryList = document.getElementById("summaryList");
+        const sidebar = document.getElementById("sidebar");
+        const toggleBtn = document.getElementById("toggleSidebar");
 
         // Handle click on upload box (opens file dialog)
         uploadBox.addEventListener("click", () => fileInput.click());
@@ -134,7 +200,9 @@
         });
 
         // Handle drag-and-drop
-        uploadBox.addEventListener("dragover", (event) => event.preventDefault());
+        uploadBox.addEventListener("dragover", (event) => {
+            event.preventDefault();
+        });
 
         uploadBox.addEventListener("drop", (event) => {
             event.preventDefault();
@@ -147,44 +215,25 @@
             if (file) {
                 uploadText.textContent = file.name;
                 summarizeBtn.disabled = false;
+                addSummary(file.name);
             }
         }
 
-        // Logout Function
-        function logout() {
-            alert("Logging out...");
-            window.location.href = "/logout"; // Redirect to logout URL
-        }
-        // Handle Summarize button click
-        summarizeBtn.addEventListener("click", async () => {
-            if (!fileInput.files.length) return;
-
-            const formData = new FormData();
-            formData.append("file", fileInput.files[0]);
-
-            // Disable button while processing
-            summarizeBtn.disabled = true;
-            summarizeBtn.textContent = "Summarizing...";
-
-            try {
-                const response = await fetch("/summarize/", {
-                    method: "POST",
-                    body: formData
-                });
-
-                const result = await response.json();
-		summaryBox.textContent = result.ai_response;
-                summaryBox.style.display = "block"; // Show the summary box
-            } catch (error) {
-                summaryBox.textContent = "Error summarizing the file.";
-                summaryBox.style.display = "block";
-            } finally {
-                summarizeBtn.disabled = false;
-                summarizeBtn.textContent = "Summarize";
+        // Add file to summary list
+        function addSummary(fileName) {
+            if (summaryList.children[0].textContent === "No summarizations yet") {
+                summaryList.innerHTML = ""; // Clear placeholder text
             }
+            const listItem = document.createElement("li");
+            listItem.textContent = fileName;
+            summaryList.appendChild(listItem);
+        }
+
+        // Sidebar toggle function
+        toggleBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("hidden");
         });
     </script>
 
 </body>
 </html>
-
