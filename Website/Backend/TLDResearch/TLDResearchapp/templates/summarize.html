@@ -103,7 +103,7 @@
 
         .container {
             position: absolute;
-            top: 20%;
+            top: 30%;
             left: 50%;
             transform: translate(-50%, -50%); /* Keeps it centered */
             display: flex;
@@ -141,6 +141,19 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
+
+	.summary-box {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+            width: 50%;
+            min-height: 100px;
+            text-align: left;
+            white-space: pre-wrap;
+            visibility: hidden; /* Initially hidden */
+        }
     </style>
 </head>
 <body>
@@ -176,8 +189,9 @@
                     <input type="file" id="fileInput" name="file" hidden>
                 </div>
 
-                <button type="submit" id="summarizeBtn" disabled>Summarize</button>
+                <button type="button" id="summarizeBtn" disabled>Summarize</button>
             </form>
+	    <div class="summary-box" id="summaryBox"></div>
         </div>
     </div>
 
@@ -190,6 +204,7 @@
         const summaryList = document.getElementById("summaryList");
         const sidebar = document.getElementById("sidebar");
         const toggleBtn = document.getElementById("toggleSidebar");
+	const summaryBox = document.getElementById("summaryBox");
 
         // Handle click on upload box (opens file dialog)
         uploadBox.addEventListener("click", () => fileInput.click());
@@ -232,6 +247,35 @@
         // Sidebar toggle function
         toggleBtn.addEventListener("click", () => {
             sidebar.classList.toggle("hidden");
+        });
+
+	summarizeBtn.addEventListener("click", async () => {
+            if (!fileInput.files.length) return;
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            // Disable button while processing
+            summarizeBtn.disabled = true;
+            summarizeBtn.textContent = "Summarizing...";
+
+            try {
+                const response = await fetch("/summarize/", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const result = await response.json();
+		summaryBox.textContent = result.ai_response;
+                summaryBox.style.display = "block"; // Show the summary box
+		summaryBox.style.visibility = "visible";
+            } catch (error) {
+                summaryBox.textContent = "Error summarizing the file.";
+                summaryBox.style.visibility = "visible";
+            } finally {
+                summarizeBtn.disabled = false;
+                summarizeBtn.textContent = "Summarize";
+            }
         });
     </script>
 
