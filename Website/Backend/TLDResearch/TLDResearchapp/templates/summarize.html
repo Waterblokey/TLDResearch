@@ -283,6 +283,7 @@
          let index = 0;
             function typeCharacter() {
                 if (index < text.length) {
+                    console.log('char c ' + text[index])
                     div.textContent += text[index];
                     index++;
                     setTimeout(typeCharacter, Math.random() * (maxDelay - minDelay) + minDelay);
