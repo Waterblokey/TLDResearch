@@ -234,6 +234,7 @@
         const summaryList = document.getElementById("summaryList");
         const sidebar = document.getElementById("sidebar");
         const toggleBtn = document.getElementById("toggleSidebar");
+        const lengthSld = document.getElementById("levelSlider");
 	const summaryBox = document.getElementById("summaryBox");
 
         // Handle click on upload box (opens file dialog)
@@ -273,6 +274,7 @@
 
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
+            formData.append("length",lengthSld.value);
 
             // Disable button while processing
             summarizeBtn.disabled = true;
