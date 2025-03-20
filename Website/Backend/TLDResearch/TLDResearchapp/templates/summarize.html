@@ -230,18 +230,7 @@
             if (file) {
                 uploadText.textContent = file.name;
                 summarizeBtn.disabled = false;
-                addSummary(file.name);
             }
-        }
-
-        // Add file to summary list
-        function addSummary(fileName) {
-            if (summaryList.children[0].textContent === "No summarizations yet") {
-                summaryList.innerHTML = ""; // Clear placeholder text
-            }
-            const listItem = document.createElement("li");
-            listItem.textContent = fileName;
-            summaryList.appendChild(listItem);
         }
 
         // Sidebar toggle function
@@ -277,7 +266,34 @@
                 summarizeBtn.textContent = "Summarize";
             }
         });
+
+        document.addEventListener("DOMContentLoaded", async function() {
+            const summaryList = document.getElementById("summaryList");
+            const summaryBox = document.getElementById("summaryBox");
+            try {
+                const response = await fetch("/get_summaries/");
+                const data = await response.json();
+		console.log(data);
+                if (data.summaries.length === 0) {
+                    summaryList.innerHTML = "<li>No summarizations yet</li>";
+                } else {
+                    summaryList.innerHTML = "";
+                    data.summaries.forEach(summary => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = summary.file_name;
+                        listItem.addEventListener("click", () => {
+                            summaryBox.textContent = summary.summary;
+                            summaryBox.style.visibility = "visible";
+                        });
+                        summaryList.appendChild(listItem);
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching summaries:", error);
+            }
+        });
     </script>
 
 </body>
 </html>
+

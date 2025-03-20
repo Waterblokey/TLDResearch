@@ -94,10 +94,10 @@ def handle_pdf_upload(request):
             ai_response = generate_gemini_response(extracted_text)
             
             username = request.user.username
-
+            
             document = {
                 "username": username,
-                "file_name": file_name,
+                "file_name": file_name.split("/")[-1],
                 "summary": ai_response,
                 "timestamp": datetime.utcnow().isoformat()
             }
