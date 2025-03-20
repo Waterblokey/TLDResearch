@@ -41,6 +41,9 @@ summaries_collection = db['summaries']
 
 from django.contrib.auth.decorators import login_required
 
+
+length_list = ["2-3","3-4","4-5","5-6"]
+
 def extract_text_from_pdf(pdf_path):
     """Extracts text from a given PDF file."""
     text = ""
@@ -49,26 +52,43 @@ def extract_text_from_pdf(pdf_path):
             text += page.get_text("text") + "\n"
     return text.strip()
 
-def generate_gemini_response(text):
+def generate_gemini_response(text,level=None):
     """Sends extracted text to Gemini 1.5 Pro and returns response."""
     model = genai.GenerativeModel("gemini-1.5-pro")
+    if level is None:
+        prompt = f"""
+        You are a summarization tool, your job is to take in research papers, and summarizes them into 2-3 sentences capturing the main ideas and outputting them back to the user. Your output should be a good representation of what the reader expects the paper to cover.
 
-    prompt = f"""
-    You are a summarization tool, your job is to take in research papers, and summarizes them into 2-3 sentences capturing the main ideas and outputting them back to the user. Your output should be a good representation of what the reader expects the paper to cover.
+        To help you with this task, here is an example input research paper and an optimal summary. You should try to mimic the style of the example output summary in the summary you generate.
 
-    To help you with this task, here is an example input research paper and an optimal summary. You should try to mimic the style of the example output summary in the summary you generate.
+        Example of an input research paper:
+        Key equatorial climate phenomena such as QBO and ENSO have never been adequately explained as deterministic processes. This in spite of recent research showing growing evidence of predictable behavior. This study applies the fundamental Laplace tidal equations with simplifying assumptions along the equator — i.e. no Coriolis force and a small angle approximation. The solutions to the partial differential equations are highly non-linear related to Navier-Stokes and only search approaches can be used to fit to the data.
 
-    Example of an input research paper:
-    Key equatorial climate phenomena such as QBO and ENSO have never been adequately explained as deterministic processes. This in spite of recent research showing growing evidence of predictable behavior. This study applies the fundamental Laplace tidal equations with simplifying assumptions along the equator — i.e. no Coriolis force and a small angle approximation. The solutions to the partial differential equations are highly non-linear related to Navier-Stokes and only search approaches can be used to fit to the data.
+        Example of an optimal output summary:
+        Analytical Formulation of Equatorial Standing Wave Phenomena: Application to QBO and ENSO.
 
-    Example of an optimal output summary:
-    Analytical Formulation of Equatorial Standing Wave Phenomena: Application to QBO and ENSO.
+        Examples done. Summarize the research paper adhering to everything you were just told:
+        {text}
 
-    Examples done. Summarize the research paper adhering to everything you were just told:
-    {text}
+        Summary:
+        """
+    else:
+        prompt = f"""
+        You are a summarization tool, your job is to take in research papers, and summarizes them into {length_list[level]} sentences capturing the main ideas and outputting them back to the user. Your output should be a good representation of what the reader expects the paper to cover.
 
-    Summary:
-    """
+        To help you with this task, here is an example input research paper and an optimal summary. You should try to mimic the style of the example output summary in the summary you generate.
+
+        Example of an input research paper:
+        Key equatorial climate phenomena such as QBO and ENSO have never been adequately explained as deterministic processes. This in spite of recent research showing growing evidence of predictable behavior. This study applies the fundamental Laplace tidal equations with simplifying assumptions along the equator — i.e. no Coriolis force and a small angle approximation. The solutions to the partial differential equations are highly non-linear related to Navier-Stokes and only search approaches can be used to fit to the data.
+
+        Example of an optimal output summary:
+        Analytical Formulation of Equatorial Standing Wave Phenomena: Application to QBO and ENSO.
+
+        Examples done. Summarize the research paper adhering to everything you were just told:
+        {text}
+
+        Summary:
+        """
 
     response = model.generate_content(prompt)
     return response.text if response else "No response from Gemini."
@@ -80,18 +100,18 @@ def handle_pdf_upload(request):
             return JsonResponse({"error": "User not authenticated"}, status=401)
     
         uploaded_file = request.FILES['file']
+        length_level = int(request.POST.get('length'))-1
 
         # Save the file temporarily
         file_path = os.path.join('uploads', uploaded_file.name)
         file_name = default_storage.save(file_path, ContentFile(uploaded_file.read()))
         full_path = default_storage.path(file_name)  # Get absolute path
-
         try:
             # Extract text from the PDF
             extracted_text = extract_text_from_pdf(full_path)
 
             # Send extracted text to Gemini AI
-            ai_response = generate_gemini_response(extracted_text)
+            ai_response = generate_gemini_response(extracted_text,length_level)
             
             username = request.user.username
             
@@ -103,7 +123,7 @@ def handle_pdf_upload(request):
             }
 
             insert = summaries_collection.insert_one(document)
-
+            default_storage.delete(full_path)
             return JsonResponse({
                 "message": "File processed successfully",
                 #"filename": uploaded_file.name,
@@ -112,6 +132,7 @@ def handle_pdf_upload(request):
             })
 
         except Exception as e:
+            default_storage.delete(full_path)
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({'error': 'No file uploaded'}, status=400)
