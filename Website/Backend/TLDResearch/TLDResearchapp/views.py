@@ -42,7 +42,7 @@ summaries_collection = db['summaries']
 from django.contrib.auth.decorators import login_required
 
 
-length_list = ["2-3","3-4","4-5","5-6"]
+length_list = ["2-3","3-4","4-5","6-9"]
 
 def extract_text_from_pdf(pdf_path):
     """Extracts text from a given PDF file."""

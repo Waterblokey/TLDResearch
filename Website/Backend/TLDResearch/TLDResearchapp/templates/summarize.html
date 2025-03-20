@@ -76,8 +76,12 @@
         .main-content {
             flex-grow: 1;
             display: flex;
-            justify-content: center;
             align-items: center;
+            flex-direction: column;
+            /* align-content: space-between; */
+            justify-content: space-evenly;
+            height: 100%;
+            gap: 5em;
         }
 
         /* Logout Form (Django-based) */
@@ -102,20 +106,21 @@
         }
 
         .container {
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            /* position: absolute; */
+            /* top: 40%; */
+            /* left: 50%; */
+            /* transform: translate(-50%, -50%); */
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
-            background: white;
+            background: #ffffff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             max-width: 70vw;
             max-height: 50vh;
+            margin-top: 2.5em;
         }
         
         .upload-box {
@@ -133,7 +138,7 @@
         button {
             padding: 10px 20px;
             border: none;
-            background: blue;
+            background: #ff0000;
             color: white;
             cursor: pointer;
             border-radius: 5px;
@@ -144,18 +149,20 @@
             cursor: not-allowed;
         }
 
-	.summary-box {
+        .summary-box {
             margin-top: 15px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             background: #f9f9f9;
             width: 50%;
-            min-height: 100px;
+            /* min-height: 50vh; */
             text-align: left;
             white-space: pre-wrap;
             visibility: hidden; /* Initially hidden */
-            overflow: auto;
+            /* overflow: auto; */
+            /* padding-bottom: 50px; */
+            /* margin-bottom: 10px; */
         }
         .upload-icon {
             width: 60px; /* Adjust size */
