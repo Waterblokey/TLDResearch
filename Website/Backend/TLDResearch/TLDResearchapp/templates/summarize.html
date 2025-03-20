@@ -103,9 +103,9 @@
 
         .container {
             position: absolute;
-            top: 30%;
+            top: 40%;
             left: 50%;
-            transform: translate(-50%, -50%); /* Keeps it centered */
+            transform: translate(-50%, -50%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -154,6 +154,11 @@
             white-space: pre-wrap;
             visibility: hidden; /* Initially hidden */
         }
+        .upload-icon {
+            width: 60px; /* Adjust size */
+            display: block;
+            margin: 0 auto 10px; /* Center image and add spacing */
+        }
     </style>
 </head>
 <body>
@@ -185,7 +190,7 @@
             <!-- File Upload Form -->
             <form id="uploadForm" method="POST" enctype="multipart/form-data">
                 <div class="upload-box" id="uploadBox">
-                    <p id="uploadText">Drag & drop a file here, or click to upload</p>
+                    <img src="upload.svg" alt="Upload Icon" class="upload-icon">
                     <input type="file" id="fileInput" name="file" hidden>
                 </div>
 
