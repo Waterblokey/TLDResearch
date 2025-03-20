@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Summarization</title>
+
+    <style>
+        /* Inline CSS */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 400px;
+        }
+
+        .upload-box {
+            width: 300px;
+            height: 150px;
+            border: 2px dashed #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            background: white;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: blue;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .summary-box {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+            width: 100%;
+            min-height: 100px;
+            text-align: left;
+            white-space: pre-wrap;
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Upload File for Summarization</h1>
+        
+        <!-- File Upload Form -->
+        <form id="uploadForm">
+            <div class="upload-box" id="uploadBox">
+                <p id="uploadText">Drag & drop a file here, or click to upload</p>
+                <input type="file" id="fileInput" name="file" hidden>
+            </div>
+
+            <button type="button" id="summarizeBtn" disabled>Summarize</button>
+        </form>
+
+        <!-- Summary Display -->
+        <div class="summary-box" id="summaryBox"></div>
+    </div>
+
+    <script>
+        const uploadBox = document.getElementById("uploadBox");
+        const fileInput = document.getElementById("fileInput");
+        const summarizeBtn = document.getElementById("summarizeBtn");
+        const uploadText = document.getElementById("uploadText");
+        const summaryBox = document.getElementById("summaryBox");
+
+        // Handle click on upload box (opens file dialog)
+        uploadBox.addEventListener("click", () => fileInput.click());
+
+        // Handle file selection via input
+        fileInput.addEventListener("change", (event) => {
+            handleFile(event.target.files[0]);
+        });
+
+        // Handle drag-and-drop
+        uploadBox.addEventListener("dragover", (event) => event.preventDefault());
+
+        uploadBox.addEventListener("drop", (event) => {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        // Function to handle file display and enable button
+        function handleFile(file) {
+            if (file) {
+                uploadText.textContent = file.name;
+                summarizeBtn.disabled = false;
+            }
+        }
+
+        // Handle Summarize button click
+        summarizeBtn.addEventListener("click", async () => {
+            if (!fileInput.files.length) return;
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            // Disable button while processing
+            summarizeBtn.disabled = true;
+            summarizeBtn.textContent = "Summarizing...";
+
+            try {
+                const response = await fetch("/summarize/", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const result = await response.json();
+		summaryBox.textContent = result.ai_response;
+                summaryBox.style.display = "block"; // Show the summary box
+            } catch (error) {
+                summaryBox.textContent = "Error summarizing the file.";
+                summaryBox.style.display = "block";
+            } finally {
+                summarizeBtn.disabled = false;
+                summarizeBtn.textContent = "Summarize";
+            }
+        });
+    </script>
+
+</body>
+</html>
+
