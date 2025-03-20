@@ -26,6 +26,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 400px;
         }
 
         .upload-box {
@@ -53,6 +54,19 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
+
+        .summary-box {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+            width: 100%;
+            min-height: 100px;
+            text-align: left;
+            white-space: pre-wrap;
+            display: none; /* Initially hidden */
+        }
     </style>
 </head>
 <body>
@@ -61,22 +75,25 @@
         <h1>Upload File for Summarization</h1>
         
         <!-- File Upload Form -->
-        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+        <form id="uploadForm">
             <div class="upload-box" id="uploadBox">
                 <p id="uploadText">Drag & drop a file here, or click to upload</p>
                 <input type="file" id="fileInput" name="file" hidden>
             </div>
 
-            <button type="submit" id="summarizeBtn" disabled>Summarize</button>
+            <button type="button" id="summarizeBtn" disabled>Summarize</button>
         </form>
+
+        <!-- Summary Display -->
+        <div class="summary-box" id="summaryBox"></div>
     </div>
 
     <script>
-        // Inline JavaScript
         const uploadBox = document.getElementById("uploadBox");
         const fileInput = document.getElementById("fileInput");
         const summarizeBtn = document.getElementById("summarizeBtn");
         const uploadText = document.getElementById("uploadText");
+        const summaryBox = document.getElementById("summaryBox");
 
         // Handle click on upload box (opens file dialog)
         uploadBox.addEventListener("click", () => fileInput.click());
@@ -87,9 +104,7 @@
         });
 
         // Handle drag-and-drop
-        uploadBox.addEventListener("dragover", (event) => {
-            event.preventDefault();
-        });
+        uploadBox.addEventListener("dragover", (event) => event.preventDefault());
 
         uploadBox.addEventListener("drop", (event) => {
             event.preventDefault();
@@ -104,7 +119,37 @@
                 summarizeBtn.disabled = false;
             }
         }
+
+        // Handle Summarize button click
+        summarizeBtn.addEventListener("click", async () => {
+            if (!fileInput.files.length) return;
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            // Disable button while processing
+            summarizeBtn.disabled = true;
+            summarizeBtn.textContent = "Summarizing...";
+
+            try {
+                const response = await fetch("/summarize/", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const result = await response.json();
+		summaryBox.textContent = result.ai_response;
+                summaryBox.style.display = "block"; // Show the summary box
+            } catch (error) {
+                summaryBox.textContent = "Error summarizing the file.";
+                summaryBox.style.display = "block";
+            } finally {
+                summarizeBtn.disabled = false;
+                summarizeBtn.textContent = "Summarize";
+            }
+        });
     </script>
 
 </body>
 </html>
+

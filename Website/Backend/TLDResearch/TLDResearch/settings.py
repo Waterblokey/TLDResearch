@@ -26,9 +26,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SECRET_KEY = 'django-insecure-sku1a5!(kceg$ya^$q+23e6cpzarr-o)fa_3i*v40eidly-*z='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
+DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["*"]
 
 # Set environment variable
 # GCP_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'credentials', 'acc.json')
@@ -122,7 +122,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+# Ensure Django knows where to look for static files
+STATICFILES_DIRS = [
+    BASE_DIR / "TLDResearchapp" / "static",  # Adjust this path based on your structure
+]
+
+# For production (when DEBUG=False), Django will collect all static files here
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -2,7 +2,16 @@ from django.shortcuts import render, HttpResponse
 
 # Create your views here.
 def home(request):
-    return HttpResponse("hello world!!")
+    if request.user.is_authenticated:
+        return render(request, "summarize.html")
+    else:
+        return render(request, "landing.html")
+
+def main(request):
+    if request.user.is_authenticated:
+        return render(request, "summarize.html")
+    else:
+        return render(request, "landing.html")
 
 from datetime import datetime
 import os
@@ -30,6 +39,7 @@ mongo_client = MongoClient(mongouri)
 db = mongo_client['TLDResearch']
 summaries_collection = db['summaries']
 
+from django.contrib.auth.decorators import login_required
 
 def extract_text_from_pdf(pdf_path):
     """Extracts text from a given PDF file."""
@@ -66,6 +76,9 @@ def generate_gemini_response(text):
 @csrf_exempt
 def handle_pdf_upload(request):
     if request.method == 'POST' and request.FILES.get('file'):
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "User not authenticated"}, status=401)
+    
         uploaded_file = request.FILES['file']
 
         # Save the file temporarily
@@ -80,8 +93,7 @@ def handle_pdf_upload(request):
             # Send extracted text to Gemini AI
             ai_response = generate_gemini_response(extracted_text)
             
-            session_cookie = request.GET.get('session_cookie')
-            username = request.session[session_cookie]
+            username = request.user.username
 
             document = {
                 "username": username,
@@ -103,3 +115,16 @@ def handle_pdf_upload(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({'error': 'No file uploaded'}, status=400)
+
+@login_required  # Ensures only authenticated users can access this route
+def get_summaries(request):
+    try:
+        username = request.user.username  # Get the logged-in user's username
+
+        # Query MongoDB for all summaries by this user
+        summaries = list(summaries_collection.find({"username": username}, {"_id": 0}))  # Exclude _id field
+
+        return JsonResponse({"summaries": summaries}, status=200)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
